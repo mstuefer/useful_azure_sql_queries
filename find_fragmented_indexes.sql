@@ -1,0 +1,22 @@
+
+--
+-- Userful Azure SQL Queries
+-- December 2015
+-- mstuefer
+--
+
+-- Find indexes with fragmentation > 10%
+SELECT  TABLE_SCHEMA AS schema_name,
+        OBJECT_NAME(F.OBJECT_ID) AS table_name,
+        I.NAME AS index_name,
+        F.AVG_FRAGMENTATION_IN_PERCENT AS avg_fragmentation_in_percent
+  FROM  SYS.DM_DB_INDEX_PHYSICAL_STATS(DB_ID(),NULL,NULL,NULL,NULL) F
+        JOIN SYS.INDEXES I
+          ON F.OBJECT_ID=I.OBJECT_ID
+             AND I.INDEX_ID=F.INDEX_ID
+        JOIN INFORMATION_SCHEMA.TABLES S
+          ON S.TABLE_NAME=OBJECT_NAME(F.OBJECT_ID)
+ WHERE  F.DATABASE_ID = DB_ID()
+   AND  F.AVG_FRAGMENTATION_IN_PERCENT > 10
+   AND  OBJECTPROPERTY(I.OBJECT_ID, 'ISSYSTEMTABLE') = 0
+ ORDER  BY F.AVG_FRAGMENTATION_IN_PERCENT DESC;
