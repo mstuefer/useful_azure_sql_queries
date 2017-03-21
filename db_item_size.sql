@@ -11,10 +11,11 @@ SELECT  SUM(reserved_page_count) * 8.0 / 1024
 
 -- Get individual db-objects size
 SELECT  sys.objects.name,
-        SUM(reserved_page_count) * 8.0 / 1024
+        SUM(reserved_page_count) * 8.0 / 1024 AS size
   FROM  sys.dm_db_partition_stats, sys.objects
  WHERE  sys.dm_db_partition_stats.object_id = sys.objects.object_id
- GROUP  BY sys.objects.name;
+ GROUP  BY sys.objects.name
+ ORDER  BY size DESC;
 
  -- Get indexes size
  SELECT  database_name,
